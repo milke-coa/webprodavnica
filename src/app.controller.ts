@@ -1,9 +1,6 @@
-/* eslint-disable @typescript-eslint/no-empty-function */
-/* eslint-disable prettier/prettier */
 import { Controller, Get } from '@nestjs/common';
-import { Administrator } from 'entiteti/administrator.entity';
+import { Administrator } from 'entities/Administrator';
 import { AdministratorService } from './services/administrator/administrator.service';
-
 
 @Controller()
 export class AppController {

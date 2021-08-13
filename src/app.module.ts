@@ -1,10 +1,10 @@
-/* eslint-disable prettier/prettier */
+
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DatabaseConfiguration } from 'config/database';
 import { AdministratorService } from './services/administrator/administrator.service';
-import { Administrator } from 'entiteti/administrator.entity';
+import { Administrator } from 'entities/Administrator';
 
 @Module({
   imports: [
