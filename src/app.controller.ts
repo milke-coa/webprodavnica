@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable prettier/prettier */
 import { Controller, Get } from '@nestjs/common';
-import { Adminitrator } from 'entiteti/administrator.entity';
+import { Administrator } from 'entiteti/administrator.entity';
 import { AdministratorService } from './services/administrator/administrator.service';
 
 
@@ -13,7 +13,7 @@ export class AppController {
     return 'Hello world';
   }
   @Get('api/administrator')
-  getAllAdnins(): Promise<Adminitrator[]>{
+  getAllAdnins(): Promise<Administrator[]>{
     return this.administratorService.getAll();
     
   }

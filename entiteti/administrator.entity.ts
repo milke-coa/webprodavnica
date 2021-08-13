@@ -2,8 +2,8 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
-export class Adminitrator {
-        @PrimaryGeneratedColumn({name: 'administartor_id', type: 'int', unsigned:true })
+export class Administrator {
+        @PrimaryGeneratedColumn({name: 'administrator_id', type: 'int', unsigned:true })
         administartorId: number;
 
         @Column({type:'varchar', length:'32', unique:true})
