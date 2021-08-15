@@ -1,12 +1,15 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable prefer-const */
 /* eslint-disable @typescript-eslint/no-var-requires */
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Administrator } from 'entities/Administrator';
-import { AddAdministratorDto } from 'src/dtos/administrator/add.admnistrator.dto';
+import { AddAdministratorDto } from 'src/dtos/administrator/add.administrator.dto'; 
 import { EditAdministratorDto } from 'src/dtos/administrator/edit.administrator.dto';
+import { ApiResponse } from 'src/misc/api.response.class';
 import { Repository } from 'typeorm';
+
 
 @Injectable()
 export class AdministratorService {
@@ -22,30 +25,42 @@ export class AdministratorService {
     getById(id: number): Promise<Administrator> {
         return this.adminstrator.findOne(id);
     }
-    add(data:AddAdministratorDto): Promise<Administrator> {
+   
+    add(data:AddAdministratorDto): Promise<Administrator | ApiResponse> {
 
         const crypto = require('crypto');
 
-        const passwordHash = crypto.createHash('512');
+        const passwordHash = crypto.createHash('sha512');
         passwordHash.update(data.password);
-        const passwordHashString = passwordHash.digest('hex').topUpperCase();
+        const passwordHashString = passwordHash.digest('hex').toUpperCase();
 
         let newAdmin = new Administrator();
         newAdmin.username = data.username;
         newAdmin.passwordHash = passwordHashString;
 
-        return this.adminstrator.save(newAdmin);
-
-
+        return new Promise((resolve)=> {
+            this.adminstrator.save(newAdmin)
+            .then(data => resolve(data))
+            .catch(error => {
+                const response: ApiResponse = new ApiResponse('error',-1001);
+                resolve(response);
+            });
+        });
     }
-    async editByID(id:number, data:EditAdministratorDto): Promise<Administrator> {
+    async editByID(id:number, data:EditAdministratorDto): Promise<Administrator | ApiResponse> {
 
         let admin: Administrator  = await this.adminstrator.findOne(id);
 
+        if(admin===undefined){
+            return new Promise((resolve)=> {
+                resolve(new ApiResponse('error', -1002));
+            });
+        }
+
         const crypto = require('crypto');
-        const passwordHash = crypto.createHash('512');
+        const passwordHash = crypto.createHash('sha512');
         passwordHash.update(data.password);
-        const passwordHashString = passwordHash.digest('hex').topUpperCase();
+        const passwordHashString = passwordHash.digest('hex').toUpperCase();
 
         admin.passwordHash = passwordHashString;
         return this.adminstrator.save(admin);
