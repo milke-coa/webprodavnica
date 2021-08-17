@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { JoinTable } from "typeorm";
+import { ManyToMany } from "typeorm";
 import {
   Column,
   Entity,
@@ -7,6 +10,7 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
+import { Article } from "./Article";
 import { ArticleFeature } from "./ArticleFeature";
 import { Category } from "./Category";
 
@@ -23,8 +27,19 @@ export class Feature {
   @Column("int", { name: "category_id", unsigned: true, default: () => "'0'" })
   categoryId: number;
 
-  @OneToMany(() => ArticleFeature, (articleFeature) => articleFeature.feature)
+  @OneToMany(
+    () => ArticleFeature,
+    (articleFeature) => articleFeature.feature
+  )
   articleFeatures: ArticleFeature[];
+
+  @ManyToMany(type => Article, article => article.features)
+  @JoinTable({
+    name: "article_feature",
+    joinColumn: { name: "feature_id", referencedColumnName: "featureId"},
+    inverseJoinColumn: { name: "article_id", referencedColumnName: "articleId"}
+  })
+  articles: Article[];
 
   @ManyToOne(() => Category, (category) => category.features, {
     onDelete: "RESTRICT",

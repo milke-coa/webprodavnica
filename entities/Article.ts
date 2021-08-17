@@ -1,8 +1,10 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   Column,
   Entity,
   Index,
   JoinColumn,
+  ManyToMany,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -12,6 +14,10 @@ import { ArticleFeature } from "./ArticleFeature";
 import { ArticlePrice } from "./ArticlePrice";
 import { CartArticle } from "./CartArticle";
 import { Photo } from "./Photo";
+import { type } from "os";
+import { JoinTable } from "typeorm";
+import { Feature } from "./Feature";
+import { features } from "process";
 
 @Index("fk_article_category_id", ["categoryId"], {})
 @Entity("article", { schema: "aplikacija" })
@@ -60,6 +66,16 @@ export class Article {
 
   @OneToMany(() => ArticleFeature, (articleFeature) => articleFeature.article)
   articleFeatures: ArticleFeature[];
+
+  @ManyToMany(type => Feature, feture => feture.articles)
+  @JoinTable({
+      name:"article_feature",
+      joinColumn: { name:"article_id", referencedColumnName: "articleId"},
+      inverseJoinColumn:{name: "feature_id", referencedColumnName:"featureId"}
+    })
+    
+  
+  features: Feature[];
 
   @OneToMany(() => ArticlePrice, (articlePrice) => articlePrice.article)
   articlePrices: ArticlePrice[];
