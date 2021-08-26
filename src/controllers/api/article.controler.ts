@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Controller } from "@nestjs/common";
+import { Body, Controller, Post } from "@nestjs/common";
 import { Crud } from "@nestjsx/crud";
 import { Article } from "entities/Article";
+import { AddArticleDto } from "src/dtos/article/add.article.dto";
 import { ArticleServices } from "src/services/article/article.service";
-
 @Controller('api/article')
 @Crud({
     model: {
@@ -36,5 +36,10 @@ import { ArticleServices } from "src/services/article/article.service";
 
 export class ArticleControler{
     constructor( public service: ArticleServices) { } 
+
+    @Post('creteFull')
+    creteFullArticle(@Body() data:AddArticleDto){
+        return this.service.creteFullArticle(data);
+    }
     
 }
