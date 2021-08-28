@@ -6,11 +6,11 @@ import { Body, Controller, Param, Post, Req, UseInterceptors } from "@nestjs/com
 import { FileInterceptor } from "@nestjs/platform-express";
 import { Crud } from "@nestjsx/crud";
 import { StorageConfig } from "config/storage.config";
-import { Article } from "entities/Article";
+import { Article } from "src/entities/Article";
 import { AddArticleDto } from "src/dtos/article/add.article.dto";
 import { ArticleServices } from "src/services/article/article.service";
 import {diskStorage} from "multer";
-import { Photo } from "entities/Photo";
+import { Photo } from "src/entities/Photo";
 import { PhotoServices } from "src/services/photo/photo.services";
 import { ApiResponse } from "src/misc/api.response.class";
 import { UploadedFile } from "@nestjs/common";
@@ -65,7 +65,7 @@ export class ArticleControler{
            // dest: StorageConfig.photos najednostavni mehanizam samo se da putanja
           
            storage:diskStorage({
-             destination: StorageConfig.photosDestination,
+             destination: StorageConfig.photo.destination,
              filename:(req, file, callback)=> {
                 // dobijamo: 'neka slika.jpg
                 //zelimo 02-02-2021-639833033-neka-slika.jpg
@@ -109,7 +109,7 @@ export class ArticleControler{
            },
            limits: {
             files: 1,
-            fileSize: StorageConfig.photosMaxFileSize,
+            fileSize: StorageConfig.photo.maxSize,
            },
            
         })
@@ -142,8 +142,8 @@ export class ArticleControler{
             return  new ApiResponse('error',-4002,'Bad content file');
        }
 
-       await this.createTumb(photo);
-       await this.createSmallImage(photo);
+       await this.createResizedImage(photo,StorageConfig.photo.resize.thumb.directory);
+       await this.createResizedImage(photo,StorageConfig.photo.resize.small.directory);
 
        const newPhoto: Photo = new Photo();
        newPhoto.articleId = articleId;
@@ -156,42 +156,26 @@ export class ArticleControler{
        return savedPhoto;
   }
 
-  async createTumb(photo) {
-      const orgainalFilePath = photo.path;
-      const fileName = photo.filename;
-
-      const destinationFilePath = StorageConfig.photosDestination+ 'thumb/'+fileName;
-
-      await sharp(orgainalFilePath)
-      .resize({
-          fit: 'cover',
-          width: StorageConfig.photoTumbSize.width,
-          height: StorageConfig.photoTumbSize.height,
-          background:{
-            r:255, g:255, b:255, alpha:0.0
-        }
-      })
-      .toFile(destinationFilePath);
-      
-  }
-  async createSmallImage(photo) {
-
+async createResizedImage(photo, resizeSetings){
+   
     const orgainalFilePath = photo.path;
     const fileName = photo.filename;
 
-    const destinationFilePath = StorageConfig.photosDestination+ 'small/'+fileName;
+    const destinationFilePath = StorageConfig.photo.destination+
+                                resizeSetings+fileName;
 
     await sharp(orgainalFilePath)
     .resize({
         fit: 'cover',
-        width: StorageConfig. potoSmallImage.width,
-        height: StorageConfig. potoSmallImage.height,
+        width: resizeSetings.width,
+        height: resizeSetings.height,
         background:{
             r:255, g:255, b:255, alpha:0.0
         }
     })
     .toFile(destinationFilePath);
-      
-}
+
+
+    }
     
 }

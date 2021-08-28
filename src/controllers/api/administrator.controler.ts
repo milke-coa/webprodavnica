@@ -2,8 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { Body, Controller, Get, Param, Post, Put } from "@nestjs/common";
-import { Administrator } from "entities/Administrator";
-import { resolve } from "path";
+import { Administrator } from "src/entities/Administrator";
 import { AddAdministratorDto } from "src/dtos/administrator/add.administrator.dto";
 import { EditAdministratorDto } from "src/dtos/administrator/edit.administrator.dto";
 import { ApiResponse } from "src/misc/api.response.class";
