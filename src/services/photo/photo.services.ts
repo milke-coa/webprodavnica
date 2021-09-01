@@ -12,6 +12,9 @@ export class PhotoServices extends TypeOrmCrudService<Photo> {
     add(newPhoto:Photo): Promise<Photo> {
         return this.photo.save(newPhoto);       
     }
+    async deleteById(id: number){
+        return await this.photo.delete(id);
+    }
 }
 
     //cim pomenete neki repizitorijum morate da ga evidentirate u vasm app modulu

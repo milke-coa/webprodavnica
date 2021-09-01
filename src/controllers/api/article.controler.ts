@@ -17,6 +17,7 @@ import { UploadedFile } from "@nestjs/common";
 import * as fileType from 'file-type';
 import * as fs from 'fs';
 import * as sharp from 'sharp';
+import { Delete } from "@nestjs/common";
 
 
 @Controller('api/article')
@@ -177,5 +178,29 @@ async createResizedImage(photo, resizeSetings){
 
 
     }
-    
+    //http://localhost:3000/api/1/deletePhoto/45
+    @Delete(':articleId/deletePhoto/:photoId')
+    public async deletePhoto(
+        @Param('articleId') articleId: number,
+        @Param('photoId') photoId: number){
+            const photo = await this.photoService.findOne({
+                articleId:articleId,
+                photoId:photoId
+            });
+            if(!photo){
+                return new ApiResponse('errore', -4004, 'Photo not found');
+            }
+            try{
+            fs.unlinkSync(StorageConfig.photo.destination + photo.imagePath);
+            fs.unlinkSync(StorageConfig.photo.destination+StorageConfig.photo.resize.thumb.directory + photo.imagePath);
+            fs.unlinkSync(StorageConfig.photo.destination+StorageConfig.photo.resize.small.directory + photo.imagePath);
+            } catch(e){ }
+
+           const deletResult = await this.photoService.deleteById(photoId);
+            if(deletResult.affected ===0){
+                return new ApiResponse('error',-4004,'Photo not found' )
+            }
+            return new ApiResponse('ok',0,'One photo deleted' )
+
+        }
 }
