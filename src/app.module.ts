@@ -23,6 +23,8 @@ import { ArticleControler } from './controllers/api/article.controler';
 import { AuthController } from './controllers/api/auth.controller';
 import { AuthMiddleware } from './middleware/auth.middleware';
 import { PhotoServices } from './services/photo/photo.services';
+import { FeatureServices } from './services/feature/feature.service';
+import { FeatureControler } from './controllers/api/feature.controller';
 
 @Module({
   imports: [
@@ -71,14 +73,16 @@ import { PhotoServices } from './services/photo/photo.services';
     AdministratorControler,
     CategoryControler,
     ArticleControler,
-    AuthController// autorizacija
-  
+    AuthController,// autorizacija
+    FeatureControler,
   ],
   providers: [
     AdministratorService,
     CategoryServices,
     ArticleServices,
-    PhotoServices
+    PhotoServices,
+    FeatureServices,
+
   ],
   exports:[
     AdministratorService,
