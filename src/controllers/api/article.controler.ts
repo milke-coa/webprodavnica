@@ -2,7 +2,7 @@
 /* eslint-disable prefer-const */
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Body, Controller, Param, Post, Req, UseInterceptors } from "@nestjs/common";
+import { Body, Controller, Param, Patch, Post, Req, UseInterceptors } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { Crud } from "@nestjsx/crud";
 import { StorageConfig } from "config/storage.config";
@@ -18,6 +18,7 @@ import * as fileType from 'file-type';
 import * as fs from 'fs';
 import * as sharp from 'sharp';
 import { Delete } from "@nestjs/common";
+import { EditArticleDto } from "src/dtos/article/edit.article.dto";
 
 
 @Controller('api/article')
@@ -34,20 +35,22 @@ import { Delete } from "@nestjs/common";
     },
     query:{
         join:{  
-             category:{ eager:true
+            category:{ eager:true
                 },
-             photos:{eager:true
+            photos:{eager:true
                  },
-             articlePrices:{ eager:true
+            articlePrices:{ eager:true
                 },
-
-             articleFeature:{ eager:true
+            articleFeatures:{ eager:true
                 },
-                features:{ eager:true
+            features:{ eager:true
                 }
 
             }
-        }  
+        },
+    routes:{
+        exclude:['updateOneBase', "replaceOneBase", "deleteOneBase"],
+    },   
 })
 
 export class ArticleControler{
@@ -55,9 +58,13 @@ export class ArticleControler{
                  public photoService: PhotoServices
         ) { } 
 
-    @Post('creteFull')
+    @Post('creteFull')// PATCH http://localhost:3000/api/article/2
     creteFullArticle(@Body() data:AddArticleDto){
         return this.service.creteFullArticle(data);
+    }
+    @Patch(':id')
+    editFullArticle(@Param('id')id:number, @Body() data:EditArticleDto){
+        return this.service.editFullArticle(id,data);
     }
 
     @Post(':id/uploadPhoto/') // POST http://

@@ -25,6 +25,7 @@ import { AuthMiddleware } from './middleware/auth.middleware';
 import { PhotoServices } from './services/photo/photo.services';
 import { FeatureServices } from './services/feature/feature.service';
 import { FeatureControler } from './controllers/api/feature.controller';
+import { UserServices } from './services/user/user.service';
 
 @Module({
   imports: [
@@ -82,6 +83,7 @@ import { FeatureControler } from './controllers/api/feature.controller';
     ArticleServices,
     PhotoServices,
     FeatureServices,
+    UserServices,
 
   ],
   exports:[

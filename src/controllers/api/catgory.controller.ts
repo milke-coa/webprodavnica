@@ -22,11 +22,11 @@ import { CategoryServices } from "src/services/category/category.service";
             categories:{
                 eager:true
              },
+            features:{
+                eager:true
+            },
              parentCategory:{
                  eager:false
-             },
-             features:{
-                 eager:true
              },
              articles:{
                  eager:false

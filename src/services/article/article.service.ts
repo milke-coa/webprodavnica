@@ -9,6 +9,7 @@ import { ArticlePrice } from "src/entities/ArticlePrice"
 import { AddArticleDto } from "src/dtos/article/add.article.dto"
 import { ApiResponse } from "src/misc/api.response.class"
 import { Repository } from "typeorm"
+import { EditArticleDto } from "src/dtos/article/edit.article.dto"
 
 Injectable()
 export class ArticleServices extends TypeOrmCrudService<Article> {
@@ -44,22 +45,81 @@ export class ArticleServices extends TypeOrmCrudService<Article> {
          for( let feature of data.features) {
             let newArticleFeature: ArticleFeature = new ArticleFeature();
             newArticleFeature.articleId = savedArticle.articleId;
-            newArticleFeature.articleFeatureId = feature.featureId;
+            newArticleFeature.featureId = feature.featureId;
             newArticleFeature.value       =   feature.value;
 
             await this.articleFeatures.save(newArticleFeature);
         }
             return await this.article.findOne(savedArticle.articleId,{
                 relations:[
-                    "category",
+                     "category",
                      "articleFeatures",
                      "features",
                      "articlePrices"
                 ]
             })
     }
+    async editFullArticle(articleId:number, data: EditArticleDto): Promise<Article | ApiResponse>{
+        const existingArticle: Article = await this.article.findOne(articleId,{
+            relations:[ 'articlePrices', 'articleFeatures']
+         });                                
 
+        if(!existingArticle){
+            return new ApiResponse('error', - 5002, 'Article not found!' )
+        }
+
+        existingArticle.name = data.name;
+        existingArticle.categoryId = data.categoryId;
+        existingArticle.excerpt = data.excerpt;
+        existingArticle.description = data.description;
+        existingArticle.status = data.status;
+        existingArticle.isPromoted = data.isPromoted;
+
+        const savedArticle = await this.article.save(existingArticle);
+
+        if(!savedArticle){
+            return new ApiResponse('error', - 5003, 'Could not save new article data!');
+        }
+        const newPrices:string = Number(data.price).toFixed(2);
+        const lastPrice: number = existingArticle.articlePrices[existingArticle.articlePrices.length-1].price;
+        const lastPriceString:string = Number(lastPrice).toFixed(2);
+
+        if(newPrices!==lastPriceString){ 
+            const newArticlePrice: ArticlePrice = new ArticlePrice();
+            newArticlePrice.articleId = existingArticle.articleId;
+            newArticlePrice.price = data.price;
+        
+            const savedPrice = await this.articlePrice.save(newArticlePrice)
+             
+            if(!newArticlePrice){
+                return new ApiResponse('error', - 5004, 'Could not save new article price!');
+            }
+        }
+
+       
+        if(data.features !== null) {
+
+            await this.articleFeatures.remove(existingArticle.articleFeatures);
+
+            for( let feature of data.features) {
+                console.log(feature.value)
+           
+                let newArticleFeature: ArticleFeature = new ArticleFeature();
+                newArticleFeature.articleId = articleId;
+                newArticleFeature.featureId = feature.featureId;
+                newArticleFeature.value     = feature.value;
+
+                await this.articleFeatures.save(newArticleFeature);
+            }
+        }
+        return await this.article.findOne(articleId,{
+            relations:[
+                     "category",
+                     "articleFeatures",
+                     "features",
+                     "articlePrices"
+                    ]
+                });
+    }    
 }
-function ArticleFeture(ArticleFeture: any) {
-    throw new Error("Function not implemented.")
-}
+

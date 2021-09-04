@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable prefer-const */
-import { Body, Controller, Post, Req } from "@nestjs/common";
+import { Body, Controller, Post, Put, Req } from "@nestjs/common";
 import { LoginAdministratorDto } from "src/dtos/administrator/login.administrator.dto";
 import { ApiResponse } from "src/misc/api.response.class";
 import { AdministratorService } from "src/services/administrator/administrator.service";
@@ -11,10 +11,14 @@ import { JwtDataAdministratorDto } from "src/dtos/administrator/jwt.data.adminis
 import { Request } from "express";
 import { jwtSecret } from "config/jwt.secret";
 import { agent } from "supertest";
+import { UserRegistrationDto } from "src/dtos/user/user.registratio. dto";
+import { UserServices } from "src/services/user/user.service";
 
 @Controller('auth')
 export class AuthController{
-    constructor (public administraorService: AdministratorService){}
+    constructor (public administraorService: AdministratorService,
+        public userService: UserServices
+        ){}
 
     @Post('login') //http://localhost:3000/auth/login/
     async doLogin(@Body()data: LoginAdministratorDto, @Req()req:Request): Promise<ApiResponse | LoginInfoAdministratorDto> {
@@ -54,6 +58,13 @@ export class AuthController{
         token);
 
         return new Promise (resolve =>resolve(responsObject));
+
+    }
+
+    @Put('user/registration')
+    async userRegistration(@Body() data:UserRegistrationDto){
+        
+        return await this.userService.register(data);
 
     }
 }
