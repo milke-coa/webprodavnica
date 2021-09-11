@@ -8,6 +8,7 @@ import { ApiResponse } from "src/misc/api.response.class";
 import * as crypto from 'crypto'; 
 
 
+
 @Injectable()
 export class UserServices extends TypeOrmCrudService<User> {
     constructor( @InjectRepository(User) 
@@ -41,9 +42,20 @@ export class UserServices extends TypeOrmCrudService<User> {
             
             return new ApiResponse('error',-6001, 'Can not create this user accunt');
 
+        }     
+    }
+        async getById(id){
+       
+        return await this.user.findOne(id);
+    }
+    async getByEmail(email: string): Promise<User | null>{
+        const user = await this.user.findOne({
+        email: email 
+    });
+    if(user){
+            return user;
         }
-        
-    
+    return null;
     }
 }
 
