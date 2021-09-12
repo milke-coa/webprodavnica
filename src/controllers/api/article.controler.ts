@@ -19,6 +19,9 @@ import * as fs from 'fs';
 import * as sharp from 'sharp';
 import { Delete } from "@nestjs/common";
 import { EditArticleDto } from "src/dtos/article/edit.article.dto";
+import { RoleCheckerGuard } from "src/misc/role.checker.guard";
+import { UseGuards } from "@nestjs/common";
+import { AlloweRoles } from "src/misc/allow.to.roles.descriptor";
 
 
 @Controller('api/article')
@@ -49,7 +52,20 @@ import { EditArticleDto } from "src/dtos/article/edit.article.dto";
             }
         },
     routes:{
-        exclude:['updateOneBase', "replaceOneBase", "deleteOneBase"],
+        only:["getOneBase", "getManyBase"],
+       
+        getManyBase:{
+            decorators:[
+                UseGuards(RoleCheckerGuard),
+                AlloweRoles('administrator', 'user')
+            ]
+        },
+        getOneBase:{
+            decorators:[
+                UseGuards(RoleCheckerGuard),
+                AlloweRoles('administrator', 'user')
+            ]
+        },
     },   
 })
 
@@ -58,16 +74,22 @@ export class ArticleControler{
                  public photoService: PhotoServices
         ) { } 
 
-    @Post('creteFull')// PATCH http://localhost:3000/api/article/2
+    @Post()// POST http://localhost:3000/api/article/2
+    @UseGuards(RoleCheckerGuard)
+    @AlloweRoles('administrator')
     creteFullArticle(@Body() data:AddArticleDto){
         return this.service.creteFullArticle(data);
     }
     @Patch(':id')
+    @UseGuards(RoleCheckerGuard)
+    @AlloweRoles('administrator')
     editFullArticle(@Param('id')id:number, @Body() data:EditArticleDto){
         return this.service.editFullArticle(id,data);
     }
 
     @Post(':id/uploadPhoto/') // POST http://
+    @UseGuards(RoleCheckerGuard)
+    @AlloweRoles('administrator')
     @UseInterceptors (
         FileInterceptor('photo',{
            // dest: StorageConfig.photos najednostavni mehanizam samo se da putanja
@@ -187,6 +209,8 @@ async createResizedImage(photo, resizeSetings){
     }
     //http://localhost:3000/api/1/deletePhoto/45
     @Delete(':articleId/deletePhoto/:photoId')
+    @UseGuards(RoleCheckerGuard)
+    @AlloweRoles('administrator')
     public async deletePhoto(
         @Param('articleId') articleId: number,
         @Param('photoId') photoId: number){

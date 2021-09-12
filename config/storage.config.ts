@@ -7,6 +7,8 @@ export const StorageConfig = {
    //refaktorisan kod
     photo:{
         destination:'../storage/photos/',
+        urlPrefix: '/assets/photo',
+        maxAge: 1000*60*60*24*7,  //kesirano 7 dana
         maxSize: 3 * 1024 *1024, // 3MB u bajtovima
         resize:{
             thumb:{

@@ -1,12 +1,14 @@
 /* eslint-disable prefer-const */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-empty-function */
-import { Body, Controller, Get, Param, Post, Put } from "@nestjs/common";
+import { Body, Controller, Get, Param, Patch, Post, Put, UseGuards } from "@nestjs/common";
 import { Administrator } from "src/entities/Administrator";
 import { AddAdministratorDto } from "src/dtos/administrator/add.administrator.dto";
 import { EditAdministratorDto } from "src/dtos/administrator/edit.administrator.dto";
 import { ApiResponse } from "src/misc/api.response.class";
 import { AdministratorService } from "src/services/administrator/administrator.service";
+import { AlloweRoles } from "src/misc/allow.to.roles.descriptor";
+import { RoleCheckerGuard } from "src/misc/role.checker.guard";
 
 @Controller('api/administrator')
 export class AdministratorControler{
@@ -16,11 +18,15 @@ export class AdministratorControler{
 
     //Get http://localhost:3000/api/administrator
     @Get()
+    @UseGuards(RoleCheckerGuard)
+    @AlloweRoles('administrator')
     getAll(): Promise<Administrator[]>{
     return this.administartorService.getAll();  
   }
      //Get http://localhost:3000/api/administrator
     @Get(':id')
+    @UseGuards(RoleCheckerGuard)
+    @AlloweRoles('administrator')
     getById(@Param('id') administratorId:number): Promise<Administrator | ApiResponse>{
        
         return new Promise(async (resolve) => {
@@ -35,17 +41,21 @@ export class AdministratorControler{
             
         });
   }
-   //Put http://localhost:3000/api/administrator
+   //Post http://localhost:3000/api/administrator
    
-   @Put()
+   @Post()
+   @UseGuards(RoleCheckerGuard)
+   @AlloweRoles('administrator')
    add(@Body() data:AddAdministratorDto): Promise<Administrator|ApiResponse>{
      return this.administartorService.add(data);
    
    }
 
-    //post http://localhost:3000/api/administrator/4
+    //Patch http://localhost:3000/api/administrator/4
    
-    @Post(':id')
+    @Patch(':id')
+    @UseGuards(RoleCheckerGuard)
+    @AlloweRoles('administrator')
     edit(@Param('id')id:number, @Body() data:EditAdministratorDto): Promise<Administrator |ApiResponse>{
      
         return this.administartorService.editByID(id, data);
